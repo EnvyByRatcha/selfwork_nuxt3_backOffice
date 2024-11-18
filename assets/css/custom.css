@@ -1,0 +1,11 @@
+.table-model{
+    @apply border-collapse border border-slate-400 w-full
+}
+
+.table-model th{
+    @apply border border-slate-300
+}
+
+.table-model td{
+    @apply border border-slate-300
+}
