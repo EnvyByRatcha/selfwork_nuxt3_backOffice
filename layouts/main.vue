@@ -15,13 +15,13 @@
                         </NuxtLink>
                     </li>
                     <li class="hover:text-white hover:bg-[#4880FF] px-4 py-2 rounded-md">
-                        <NuxtLink class="block" to="/">
-                            Usern
+                        <NuxtLink class="block" to="/user">
+                            User
                         </NuxtLink>
                     </li>
                     <li class="hover:text-white hover:bg-[#4880FF] px-4 py-2 rounded-md">
-                        <NuxtLink class="block" to="/">
-                            Workplace
+                        <NuxtLink class="block" to="/customer">
+                            Customer
                         </NuxtLink>
                     </li>
                     <li class="hover:text-white hover:bg-[#4880FF] px-4 py-2 rounded-md">
@@ -48,6 +48,4 @@
 
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
