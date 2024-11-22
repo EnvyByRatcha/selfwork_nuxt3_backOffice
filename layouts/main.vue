@@ -25,8 +25,13 @@
                         </NuxtLink>
                     </li>
                     <li class="hover:text-white hover:bg-[#4880FF] px-4 py-2 rounded-md">
-                        <NuxtLink class="block" to="/">
-                            Store
+                        <NuxtLink class="block" to="/product">
+                            Product
+                        </NuxtLink>
+                    </li>
+                    <li class="hover:text-white hover:bg-[#4880FF] px-4 py-2 rounded-md">
+                        <NuxtLink class="block" to="/product/detail">
+                            ProductDetail
                         </NuxtLink>
                     </li>
                 </ul>

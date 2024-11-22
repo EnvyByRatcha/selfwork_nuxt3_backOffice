@@ -19,6 +19,7 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import config from '../config'
 
 const username = ref('')
 const password = ref('')
@@ -36,7 +37,7 @@ async function signIn() {
             localStorage.setItem('name', res.data.name)
             localStorage.setItem('id', res.data.id)
 
-            navigateTo('/home')
+            navigateTo('/dashboard')
         }
     } catch (e) {
         console.log(e)
