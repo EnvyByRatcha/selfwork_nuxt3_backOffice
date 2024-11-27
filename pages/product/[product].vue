@@ -5,17 +5,16 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
         </button>
+
+        <h2 class="text-2xl">{{ route.params.product }}</h2>
+
     </div>
 
     <div class="mt-4">
         <form @submit.prevent="search" class="flex space-x-4">
             <label class="input input-bordered flex items-center gap-2">
-                <input type="text" class="grow" placeholder="Enter Serial Number" />
+                <input v-model="targetSearch" type="text" class="grow" placeholder="Enter Serial Number" required/>
             </label>
-            <select class="select select-error w-full max-w-xs" required>
-                <option v-for="item in categories" :key="item.id" :value="item.id">{{ item.name }}
-                </option>
-            </select>
             <button type="submit" class="btn btn-success"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -63,15 +62,11 @@
     </div>
 
     <ModalComponent target="modalProduct" header="Add Product" @close="clearForm">
-        <form @submit.prevent="save" class="mt-4 space-y-4">
-            <select v-model="productDetail.productId" class="select select-success w-full max-w-xs" required>
-                <option v-for="item in products" :key="item.id" :value="item.id">{{ item.name }}
-                </option>
-            </select>
+        <form @submit.prevent="save" class="mt-4 space-y-4 flex flex-col">
             <label class="input input-bordered flex items-center gap-2">
                 Serial Number
-                <input v-model="productDetail.serialNumber" type="text" class="grow"
-                    placeholder="Enter Serial Number" required>
+                <input v-model="productDetail.serialNumber" type="text" class="grow" placeholder="Enter Serial Number"
+                    required>
             </label>
             <button type="submit" class="btn btn-success">Save</button>
         </form>
@@ -85,56 +80,28 @@ import { ref } from 'vue';
 import config from '../../config'
 import Swal from 'sweetalert2';
 
-const products = ref([])
-const categories = ref([])
+const route = useRoute()
 const productDetails = ref([])
 
 const productDetail = ref({
     id: 0,
-    serialNumber: '',
-    productId: 0,
+    serialNumber: ''
 })
+const targetSearch = ref('')
 
 onMounted(() => {
-    fetchDataCategory()
-    fetchDataProduct()
     fetchDataProductDetail()
 })
 
-const fetchDataCategory = async () => {
-    try {
-        const res = await axios.get(config.apiPath + '/api/category/list')
-        categories.value = res.data.results
-    } catch (e) {
-        Swal.fire({
-            title: 'error',
-            text: e.messge,
-            icon: 'error'
-        })
-    }
-}
-
-const fetchDataProduct = async () => {
-    try {
-        const res = await axios.get(config.apiPath + '/api/product/list')
-        products.value = res.data.results
-    } catch (e) {
-        Swal.fire({
-            title: 'error',
-            text: e.messge,
-            icon: 'error'
-        })
-    }
-}
 
 const fetchDataProductDetail = async () => {
     try {
-        const res = await axios.get(config.apiPath + '/api/productDetail/list')
+        const res = await axios.get(config.apiPath + '/api/productDetail/list/' + route.params.product)
         productDetails.value = res.data.results
     } catch (e) {
         Swal.fire({
             title: 'error',
-            text: e.messge,
+            text: e.message,
             icon: 'error'
         })
     }
@@ -145,12 +112,11 @@ const save = async () => {
         const payload = {
             id: productDetail.value.id,
             serialNumber: productDetail.value.serialNumber,
-            productId: productDetail.value.productId
         }
 
         let res
         if (productDetail.value.id == 0) {
-            res = await axios.post(config.apiPath + '/api/productDetail/create', payload)
+            res = await axios.post(config.apiPath + '/api/productDetail/create/' + route.params.product, payload)
             if (res.data.message == 'success') {
                 Swal.fire({
                     title: 'Create Product',
@@ -179,33 +145,68 @@ const save = async () => {
     } catch (e) {
         Swal.fire({
             title: 'error',
-            text: e.messge,
+            text: e.messgae,
             icon: 'error'
         })
     }
 }
 
-const remove = async () => {
+const remove = async (item) => {
+    try {
+        const button = await Swal.fire({
+            title: 'Remove Product',
+            text: 'Confirm remove ' + item.serialNumber + ' ??',
+            icon: 'question',
+            showConfirmButton: true,
+            showCancelButton: true
+        })
 
+        if (button.isConfirmed) {
+            const res = await axios.delete(config.apiPath + '/api/productDetail/remove/' + item.id)
+            if (res.data.message == 'success') {
+                Swal.fire({
+                    title: 'Remove Product',
+                    text: 'Success',
+                    icon: 'success',
+                    timer: 1500
+                })
+
+                fetchDataProductDetail()
+            }
+        }
+    } catch (e) {
+        Swal.fire({
+            title: 'error',
+            text: e.message,
+            icon: 'error'
+        })
+    }
 }
 
 const search = async () => {
-
+    try {
+        const res = await axios.get(config.apiPath + '/api/productDetail/search/' + route.params.product + '/' + targetSearch.value)
+        if (res.data.results !== null) {
+            productDetails.value = res.data.results
+        }
+    } catch (e) {
+        Swal.fire({
+            title: 'error',
+            text: e.message,
+            icon: 'error'
+        })
+    }
 }
 
 const selectProductDetail = (item) => {
     productDetail.value.id = item.id
     productDetail.value.serialNumber = item.serialNumber
-    productDetail.value.productId = item.productId
 }
 
 const clearForm = () => {
     productDetail.value.id = 0
     productDetail.value.serialNumber = ''
-    productDetail.value.productId = 0
 }
-
-
 
 definePageMeta({
     layout: 'main'
